@@ -426,19 +426,6 @@ private fun HeaderSection(
                 )
             }
 
-            // ── Add Employee Button ──
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Employee",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
         }
     }
 }
@@ -454,6 +441,13 @@ private fun CameraPreviewWithOverlay(viewModel: AttendanceViewModel) {
 
     // Analysis executor – single-thread for sequential frame processing
     val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
+
+    // Shutdown executor when this composable leaves composition
+    DisposableEffect(Unit) {
+        onDispose {
+            analysisExecutor.shutdown()
+        }
+    }
 
     AndroidView(
         modifier = Modifier
@@ -499,8 +493,6 @@ private fun CameraPreviewWithOverlay(viewModel: AttendanceViewModel) {
                             isLivenessEnabled = { viewModel.isLivenessEnabled.value },
                             onLivenessStateChange = { show -> viewModel.updateLivenessPrompt(show) },
                             onFaceDetected = { faceBitmap, yaw ->
-                                // This callback runs on the analysis thread.
-                                // The ViewModel handles thread switching internally.
                                 viewModel.onFaceDetected(faceBitmap, yaw)
                             },
                             onNoFace = {

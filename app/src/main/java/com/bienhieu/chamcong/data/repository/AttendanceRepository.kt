@@ -36,7 +36,7 @@ class AttendanceRepository(
 
     suspend fun updateEmployeeWithSync(employee: EmployeeEntity) {
         employeeDao.update(employee)
-        syncManager.updateEmployeeFace(employee.id, employee.faceVectors)
+        employee.faceVectors?.let { syncManager.updateEmployeeFace(employee.id, it) }
     }
 
     suspend fun deleteEmployee(employeeId: String) {

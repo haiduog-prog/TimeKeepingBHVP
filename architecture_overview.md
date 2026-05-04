@@ -53,9 +53,9 @@ sequenceDiagram
 
     Camera->>MLKit: ImageProxy (YUV_420_888)
     MLKit->>MLKit: Detect face bounding box
-    MLKit->>TFLite: Cropped face Bitmap (112×112)
+    MLKit->>TFLite: Cropped face Bitmap (160×160)
     TFLite->>TFLite: Normalize pixels [-1, 1]
-    TFLite->>VM: FloatArray embedding (192-dim)
+    TFLite->>VM: FloatArray embedding (512-dim)
     VM->>VM: L2 normalize embedding
     VM->>Room: Load all employee vectors
     Room-->>VM: List<EmployeeEntity>

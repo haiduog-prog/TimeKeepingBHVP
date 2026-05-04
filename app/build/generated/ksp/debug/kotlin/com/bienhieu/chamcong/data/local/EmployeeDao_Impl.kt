@@ -41,8 +41,18 @@ public class EmployeeDao_Impl(
       protected override fun bind(statement: SQLiteStatement, entity: EmployeeEntity) {
         statement.bindText(1, entity.id)
         statement.bindText(2, entity.name)
-        val _tmp: String = __vectorTypeConverter.fromFaceVectors(entity.faceVectors)
-        statement.bindText(3, _tmp)
+        val _tmpFaceVectors: List<FloatArray>? = entity.faceVectors
+        val _tmp: String?
+        if (_tmpFaceVectors == null) {
+          _tmp = null
+        } else {
+          _tmp = __vectorTypeConverter.fromFaceVectors(_tmpFaceVectors)
+        }
+        if (_tmp == null) {
+          statement.bindNull(3)
+        } else {
+          statement.bindText(3, _tmp)
+        }
         val _tmpPhotoPath: String? = entity.photoPath
         if (_tmpPhotoPath == null) {
           statement.bindNull(4)
@@ -59,8 +69,18 @@ public class EmployeeDao_Impl(
       protected override fun bind(statement: SQLiteStatement, entity: EmployeeEntity) {
         statement.bindText(1, entity.id)
         statement.bindText(2, entity.name)
-        val _tmp: String = __vectorTypeConverter.fromFaceVectors(entity.faceVectors)
-        statement.bindText(3, _tmp)
+        val _tmpFaceVectors: List<FloatArray>? = entity.faceVectors
+        val _tmp: String?
+        if (_tmpFaceVectors == null) {
+          _tmp = null
+        } else {
+          _tmp = __vectorTypeConverter.fromFaceVectors(_tmpFaceVectors)
+        }
+        if (_tmp == null) {
+          statement.bindNull(3)
+        } else {
+          statement.bindText(3, _tmp)
+        }
         val _tmpPhotoPath: String? = entity.photoPath
         if (_tmpPhotoPath == null) {
           statement.bindNull(4)
@@ -106,10 +126,18 @@ public class EmployeeDao_Impl(
           _tmpId = _stmt.getText(_columnIndexOfId)
           val _tmpName: String
           _tmpName = _stmt.getText(_columnIndexOfName)
-          val _tmpFaceVectors: List<FloatArray>
-          val _tmp: String
-          _tmp = _stmt.getText(_columnIndexOfFaceVectors)
-          _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
+          val _tmpFaceVectors: List<FloatArray>?
+          val _tmp: String?
+          if (_stmt.isNull(_columnIndexOfFaceVectors)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getText(_columnIndexOfFaceVectors)
+          }
+          if (_tmp == null) {
+            _tmpFaceVectors = null
+          } else {
+            _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
+          }
           val _tmpPhotoPath: String?
           if (_stmt.isNull(_columnIndexOfPhotoPath)) {
             _tmpPhotoPath = null
@@ -145,10 +173,18 @@ public class EmployeeDao_Impl(
           _tmpId = _stmt.getText(_columnIndexOfId)
           val _tmpName: String
           _tmpName = _stmt.getText(_columnIndexOfName)
-          val _tmpFaceVectors: List<FloatArray>
-          val _tmp: String
-          _tmp = _stmt.getText(_columnIndexOfFaceVectors)
-          _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
+          val _tmpFaceVectors: List<FloatArray>?
+          val _tmp: String?
+          if (_stmt.isNull(_columnIndexOfFaceVectors)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getText(_columnIndexOfFaceVectors)
+          }
+          if (_tmp == null) {
+            _tmpFaceVectors = null
+          } else {
+            _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
+          }
           val _tmpPhotoPath: String?
           if (_stmt.isNull(_columnIndexOfPhotoPath)) {
             _tmpPhotoPath = null
@@ -185,10 +221,18 @@ public class EmployeeDao_Impl(
           _tmpId = _stmt.getText(_columnIndexOfId)
           val _tmpName: String
           _tmpName = _stmt.getText(_columnIndexOfName)
-          val _tmpFaceVectors: List<FloatArray>
-          val _tmp: String
-          _tmp = _stmt.getText(_columnIndexOfFaceVectors)
-          _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
+          val _tmpFaceVectors: List<FloatArray>?
+          val _tmp: String?
+          if (_stmt.isNull(_columnIndexOfFaceVectors)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getText(_columnIndexOfFaceVectors)
+          }
+          if (_tmp == null) {
+            _tmpFaceVectors = null
+          } else {
+            _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
+          }
           val _tmpPhotoPath: String?
           if (_stmt.isNull(_columnIndexOfPhotoPath)) {
             _tmpPhotoPath = null

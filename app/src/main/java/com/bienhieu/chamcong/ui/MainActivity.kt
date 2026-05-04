@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.bienhieu.chamcong.TimeKeepingApp
+import com.bienhieu.chamcong.ui.navigation.Route
 import com.bienhieu.chamcong.ui.theme.ChamCongTheme
 
 /**
@@ -38,7 +39,6 @@ class MainActivity : ComponentActivity() {
             setupUi()
         } else {
             // In a kiosk app, camera permission is critical.
-            // You may want to show a permanent error screen here.
             finish()
         }
     }
@@ -74,14 +74,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavHost(navController = navController, startDestination = "attendance") {
-                        composable("attendance") {
+                    NavHost(navController = navController, startDestination = Route.Attendance.route) {
+                        composable(Route.Attendance.route) {
                             AttendanceScreen(
                                 viewModel = viewModel,
-                                onNavigateToEmployees = { navController.navigate("employees") }
+                                onNavigateToEmployees = { navController.navigate(Route.Employees.route) }
                             )
                         }
-                        composable("employees") {
+                        composable(Route.Employees.route) {
                             EmployeeListScreen(
                                 viewModel = viewModel,
                                 onBack = { navController.popBackStack() }

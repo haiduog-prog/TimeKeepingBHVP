@@ -13,13 +13,10 @@ import com.bienhieu.chamcong.data.local.TimeKeepingDatabase
 import com.bienhieu.chamcong.data.local.EmployeeEntity
 import com.bienhieu.chamcong.data.remote.SupabaseSyncManager
 import com.bienhieu.chamcong.ml.FaceEmbeddingHelper
-import com.bienhieu.chamcong.ml.FaceMatcher
-import com.bienhieu.chamcong.ml.VectorMath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Calendar
 import com.bienhieu.chamcong.data.repository.AttendanceRepository
 import com.bienhieu.chamcong.domain.ProcessAttendanceUseCase
 import com.bienhieu.chamcong.domain.ProcessResult
@@ -146,11 +143,9 @@ class AttendanceViewModel(
     fun registerEmployee(name: String, faceBitmap: Bitmap, context: Context) {
         viewModelScope.launch {
             try {
-                // 1. Extract embedding
+                // 1. Extract embedding (already L2-normalized by FaceEmbeddingHelper)
                 val embedding = withContext(Dispatchers.Default) {
-                    val raw = embeddingHelper.getEmbedding(faceBitmap)
-                    VectorMath.l2Normalize(raw)
-                    raw
+                    embeddingHelper.getEmbedding(faceBitmap)
                 }
 
                 // 2. Save the face image to a file
@@ -185,14 +180,12 @@ class AttendanceViewModel(
     fun updateEmployeeFace(context: Context) {
         val employee = _employeeToRegister.value ?: return
         val faceBitmap = latestDetectedFace.value ?: return
-        
+
         viewModelScope.launch {
             try {
-                // 1. Extract embedding
+                // 1. Extract embedding (already L2-normalized by FaceEmbeddingHelper)
                 val embedding = withContext(Dispatchers.Default) {
-                    val raw = embeddingHelper.getEmbedding(faceBitmap)
-                    VectorMath.l2Normalize(raw)
-                    raw
+                    embeddingHelper.getEmbedding(faceBitmap)
                 }
 
                 // 2. Save the face image to a file

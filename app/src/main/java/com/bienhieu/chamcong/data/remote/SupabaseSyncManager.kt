@@ -64,7 +64,7 @@ class SupabaseSyncManager(
                 if (local != null) {
                     // Cập nhật tên. Nếu Supabase gửi về vector rỗng (ví dụ: tạo tay trên web), 
                     // giữ lại vector cũ đã quét từ trước trên máy. Nếu có vector mới thì lấy vector mới.
-                    val mergedVectors = if (remote.faceVectors.isNotEmpty()) remote.faceVectors else local.faceVectors
+                    val mergedVectors = if (!remote.faceVectors.isNullOrEmpty()) remote.faceVectors else local.faceVectors
                     toUpdate.add(
                         local.copy(
                             name = remote.name,

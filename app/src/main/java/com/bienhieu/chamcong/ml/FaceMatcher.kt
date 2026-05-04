@@ -66,7 +66,7 @@ object FaceMatcher {
         var bestScore = -1f // Cosine similarity ranges [-1, 1], so -1 is a safe floor
 
         for (employee in employees) {
-            if (employee.faceVectors.isEmpty()) {
+            if (employee.faceVectors.isNullOrEmpty()) {
                 continue
             }
 

@@ -5,7 +5,6 @@ import com.bienhieu.chamcong.data.local.AttendanceEntity
 import com.bienhieu.chamcong.data.repository.AttendanceRepository
 import com.bienhieu.chamcong.ml.FaceEmbeddingHelper
 import com.bienhieu.chamcong.ml.FaceMatcher
-import com.bienhieu.chamcong.ml.VectorMath
 import com.bienhieu.chamcong.ui.AttendanceType
 
 /**
@@ -32,24 +31,21 @@ class ProcessAttendanceUseCase(
      */
     suspend operator fun invoke(faceBitmap: Bitmap): ProcessResult {
         return try {
-            // 1. Extract face embedding via TFLite
+            // 1. Extract face embedding via TFLite (already L2-normalized internally)
             val embedding = embeddingHelper.getEmbedding(faceBitmap)
 
-            // 2. L2-normalize for consistent cosine similarity
-            VectorMath.l2Normalize(embedding)
-
-            // 3. Load all registered employees & find best match
+            // 2. Load all registered employees & find best match
             val employees = repository.getAllEmployees()
             val match = FaceMatcher.findBestMatch(embedding, employees)
 
             if (match.isMatch && match.employee != null) {
                 val emp = match.employee
 
-                // 4. Determine Attendance Type (IN / OUT)
+                // 3. Determine Attendance Type (IN / OUT)
                 val latest = repository.getLatestAttendanceToday(emp.id)
                 val type = if (latest == null || latest.status == AttendanceType.OUT.name) AttendanceType.IN else AttendanceType.OUT
 
-                // 5. Record to DB
+                // 4. Record to DB
                 val record = AttendanceEntity(
                     employeeId = emp.id,
                     employeeName = emp.name,

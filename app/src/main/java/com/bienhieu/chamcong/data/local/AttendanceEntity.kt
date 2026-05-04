@@ -1,6 +1,7 @@
 package com.bienhieu.chamcong.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -13,7 +14,13 @@ import androidx.room.PrimaryKey
  * @property confidence The cosine similarity score at time of match.
  * @property isSynced   Whether this record has been synced to Supabase.
  */
-@Entity(tableName = "attendance_records")
+@Entity(
+    tableName = "attendance_records",
+    indices = [
+        Index(value = ["employeeId", "timestamp"]),
+        Index(value = ["isSynced"])
+    ]
+)
 data class AttendanceEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

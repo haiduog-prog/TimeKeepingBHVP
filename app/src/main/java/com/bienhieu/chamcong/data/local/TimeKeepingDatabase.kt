@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 @Database(
     entities = [EmployeeEntity::class, AttendanceEntity::class],
-    version = 4,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(VectorTypeConverter::class)
@@ -41,11 +41,9 @@ abstract class TimeKeepingDatabase : RoomDatabase() {
          */
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Add employeeName to attendance_records (default empty for existing rows)
                 db.execSQL(
                     "ALTER TABLE attendance_records ADD COLUMN employeeName TEXT NOT NULL DEFAULT ''"
                 )
-                // Add photoPath to employees (nullable)
                 db.execSQL(
                     "ALTER TABLE employees ADD COLUMN photoPath TEXT DEFAULT NULL"
                 )
@@ -78,6 +76,41 @@ abstract class TimeKeepingDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Migration from version 4 → 5.
+         * Added indices on attendance_records for query performance:
+         *  - (employeeId, timestamp) for getLatestToday queries
+         *  - (isSynced) for sync queries
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_attendance_records_employeeId_timestamp` ON `attendance_records` (`employeeId`, `timestamp`)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_attendance_records_isSynced` ON `attendance_records` (`isSynced`)"
+                )
+            }
+        }
+
+        /**
+         * Migration from version 5 → 6.
+         * Made faceVectors nullable in employees table.
+         * Since SQLite cannot alter column to nullable, we recreate the table.
+         */
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Create new table with nullable faceVectors
+                db.execSQL("CREATE TABLE IF NOT EXISTS `employees_new` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `faceVectors` TEXT, `photoPath` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+                // Copy data from old table
+                db.execSQL("INSERT INTO `employees_new` (`id`, `name`, `faceVectors`, `photoPath`, `createdAt`) SELECT `id`, `name`, `faceVectors`, `photoPath`, `createdAt` FROM `employees`")
+                // Drop old table
+                db.execSQL("DROP TABLE `employees`")
+                // Rename new table
+                db.execSQL("ALTER TABLE `employees_new` RENAME TO `employees`")
+            }
+        }
+
         // ─── Singleton accessor ───────────────────────────────────────
 
         /**
@@ -94,7 +127,7 @@ abstract class TimeKeepingDatabase : RoomDatabase() {
                     TimeKeepingDatabase::class.java,
                     "chamcong.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build()
                     .also { INSTANCE = it }
             }

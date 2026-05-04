@@ -36,7 +36,7 @@ class TimeKeepingApp : Application() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        // Sync every 15 minutes (minimum periodic interval allowed by WorkManager)
+        // Sync every 4 hours (minimum periodic interval allowed by WorkManager)
         val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
             4,
             TimeUnit.HOURS

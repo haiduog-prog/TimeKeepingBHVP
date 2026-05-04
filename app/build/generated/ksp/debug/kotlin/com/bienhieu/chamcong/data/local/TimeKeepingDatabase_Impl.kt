@@ -36,13 +36,15 @@ public class TimeKeepingDatabase_Impl : TimeKeepingDatabase() {
   }
 
   protected override fun createOpenDelegate(): RoomOpenDelegate {
-    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(4,
-        "f33a1c98dc4f627cf9789ce5ffca3dd8", "a7f54e96b572e2a688518c9523dbdf2b") {
+    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(6,
+        "6d330d37fa1392bcd15671c98efda624", "69add27df559909b03e23b0b25250ac9") {
       public override fun createAllTables(connection: SQLiteConnection) {
-        connection.execSQL("CREATE TABLE IF NOT EXISTS `employees` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `faceVectors` TEXT NOT NULL, `photoPath` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `employees` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `faceVectors` TEXT, `photoPath` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE TABLE IF NOT EXISTS `attendance_records` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `employeeId` TEXT NOT NULL, `employeeName` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `status` TEXT NOT NULL, `confidence` REAL NOT NULL, `isSynced` INTEGER NOT NULL)")
+        connection.execSQL("CREATE INDEX IF NOT EXISTS `index_attendance_records_employeeId_timestamp` ON `attendance_records` (`employeeId`, `timestamp`)")
+        connection.execSQL("CREATE INDEX IF NOT EXISTS `index_attendance_records_isSynced` ON `attendance_records` (`isSynced`)")
         connection.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)")
-        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f33a1c98dc4f627cf9789ce5ffca3dd8')")
+        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d330d37fa1392bcd15671c98efda624')")
       }
 
       public override fun dropAllTables(connection: SQLiteConnection) {
@@ -71,7 +73,7 @@ public class TimeKeepingDatabase_Impl : TimeKeepingDatabase() {
             TableInfo.CREATED_FROM_ENTITY))
         _columnsEmployees.put("name", TableInfo.Column("name", "TEXT", true, 0, null,
             TableInfo.CREATED_FROM_ENTITY))
-        _columnsEmployees.put("faceVectors", TableInfo.Column("faceVectors", "TEXT", true, 0, null,
+        _columnsEmployees.put("faceVectors", TableInfo.Column("faceVectors", "TEXT", false, 0, null,
             TableInfo.CREATED_FROM_ENTITY))
         _columnsEmployees.put("photoPath", TableInfo.Column("photoPath", "TEXT", false, 0, null,
             TableInfo.CREATED_FROM_ENTITY))
@@ -108,6 +110,10 @@ public class TimeKeepingDatabase_Impl : TimeKeepingDatabase() {
             null, TableInfo.CREATED_FROM_ENTITY))
         val _foreignKeysAttendanceRecords: MutableSet<TableInfo.ForeignKey> = mutableSetOf()
         val _indicesAttendanceRecords: MutableSet<TableInfo.Index> = mutableSetOf()
+        _indicesAttendanceRecords.add(TableInfo.Index("index_attendance_records_employeeId_timestamp",
+            false, listOf("employeeId", "timestamp"), listOf("ASC", "ASC")))
+        _indicesAttendanceRecords.add(TableInfo.Index("index_attendance_records_isSynced", false,
+            listOf("isSynced"), listOf("ASC")))
         val _infoAttendanceRecords: TableInfo = TableInfo("attendance_records",
             _columnsAttendanceRecords, _foreignKeysAttendanceRecords, _indicesAttendanceRecords)
         val _existingAttendanceRecords: TableInfo = read(connection, "attendance_records")
