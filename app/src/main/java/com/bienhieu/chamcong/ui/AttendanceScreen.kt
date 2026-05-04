@@ -498,10 +498,10 @@ private fun CameraPreviewWithOverlay(viewModel: AttendanceViewModel) {
                         setAnalyzer(analysisExecutor, FaceAnalyzer(
                             isLivenessEnabled = { viewModel.isLivenessEnabled.value },
                             onLivenessStateChange = { show -> viewModel.updateLivenessPrompt(show) },
-                            onFaceDetected = { faceBitmap ->
+                            onFaceDetected = { faceBitmap, yaw ->
                                 // This callback runs on the analysis thread.
                                 // The ViewModel handles thread switching internally.
-                                viewModel.onFaceDetected(faceBitmap)
+                                viewModel.onFaceDetected(faceBitmap, yaw)
                             },
                             onNoFace = {
                                 viewModel.updateLivenessPrompt(false)

@@ -34,29 +34,21 @@ class SupabaseSyncManager(
 
             // Chuyển đổi trên Dispatchers.Default để không block luồng IO/UI
             withContext(Dispatchers.Default) {
+                val vectorConverter = com.bienhieu.chamcong.data.local.VectorTypeConverter()
                 remoteEmployees.forEach { remote ->
                     if (remote.isActive) {
                         try {
-                            val floatArray = if (remote.faceVector != null) {
-                                val cleanString = remote.faceVector.trim('[', ']')
-                                if (cleanString.isNotEmpty()) {
-                                    cleanString.split(",").map { it.trim().toFloat() }.toFloatArray()
-                                } else {
-                                    FloatArray(0)
-                                }
-                            } else {
-                                FloatArray(0)
-                            }
+                            val vectors = vectorConverter.toFaceVectors(remote.faceVector ?: "")
 
                             localEmployees.add(
                                 EmployeeEntity(
                                     id = remote.id,
                                     name = remote.name,
-                                    faceVector = floatArray
+                                    faceVectors = vectors
                                 )
                             )
                         } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing face vector for ${remote.name}", e)
+                            Log.e(TAG, "Error parsing face vectors for ${remote.name}", e)
                         }
                     }
                 }
@@ -72,11 +64,11 @@ class SupabaseSyncManager(
                 if (local != null) {
                     // Cập nhật tên. Nếu Supabase gửi về vector rỗng (ví dụ: tạo tay trên web), 
                     // giữ lại vector cũ đã quét từ trước trên máy. Nếu có vector mới thì lấy vector mới.
-                    val mergedVector = if (remote.faceVector.isNotEmpty()) remote.faceVector else local.faceVector
+                    val mergedVectors = if (remote.faceVectors.isNotEmpty()) remote.faceVectors else local.faceVectors
                     toUpdate.add(
                         local.copy(
                             name = remote.name,
-                            faceVector = mergedVector
+                            faceVectors = mergedVectors
                         )
                     )
                 } else {
@@ -147,9 +139,10 @@ class SupabaseSyncManager(
     /**
      * Cập nhật vector khuôn mặt của nhân viên lên Supabase.
      */
-    suspend fun updateEmployeeFace(employeeId: String, faceVector: FloatArray) = withContext(Dispatchers.IO) {
+    suspend fun updateEmployeeFace(employeeId: String, faceVectors: List<FloatArray>) = withContext(Dispatchers.IO) {
         try {
-            val vectorString = faceVector.joinToString(prefix = "[", postfix = "]")
+            val vectorConverter = com.bienhieu.chamcong.data.local.VectorTypeConverter()
+            val vectorString = vectorConverter.fromFaceVectors(faceVectors)
             
             SupabaseClient.client.from("employees").update(
                 {
@@ -160,9 +153,9 @@ class SupabaseSyncManager(
                     eq("id", employeeId)
                 }
             }
-            Log.d(TAG, "Successfully updated face vector on Supabase for $employeeId")
+            Log.d(TAG, "Successfully updated face vectors on Supabase for $employeeId")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to update face vector on Supabase for $employeeId", e)
+            Log.e(TAG, "Failed to update face vectors on Supabase for $employeeId", e)
         }
     }
 }

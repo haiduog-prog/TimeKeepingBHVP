@@ -66,16 +66,23 @@ object FaceMatcher {
         var bestScore = -1f // Cosine similarity ranges [-1, 1], so -1 is a safe floor
 
         for (employee in employees) {
-            // Bỏ qua những người chưa có dữ liệu khuôn mặt hoặc sai kích thước vector
-            if (employee.faceVector.isEmpty() || probeEmbedding.size != employee.faceVector.size) {
+            if (employee.faceVectors.isEmpty()) {
                 continue
             }
 
-            // ── Compute similarity between probe and this employee's stored vector ──
-            val score = VectorMath.cosineSimilarity(probeEmbedding, employee.faceVector)
+            // ── Compute similarity between probe and all stored vectors for this employee ──
+            var bestScoreForEmployee = -1f
+            for (vector in employee.faceVectors) {
+                if (probeEmbedding.size != vector.size) continue
+                
+                val score = VectorMath.cosineSimilarity(probeEmbedding, vector)
+                if (score > bestScoreForEmployee) {
+                    bestScoreForEmployee = score
+                }
+            }
 
-            if (score > bestScore) {
-                bestScore = score
+            if (bestScoreForEmployee > bestScore) {
+                bestScore = bestScoreForEmployee
                 bestEmployee = employee
             }
         }

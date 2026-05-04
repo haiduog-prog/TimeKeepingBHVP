@@ -36,13 +36,13 @@ public class TimeKeepingDatabase_Impl : TimeKeepingDatabase() {
   }
 
   protected override fun createOpenDelegate(): RoomOpenDelegate {
-    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(3,
-        "b3d430438580bc54daf889f817f90b82", "87724e138d0ca878e150897aa3f92308") {
+    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(4,
+        "f33a1c98dc4f627cf9789ce5ffca3dd8", "a7f54e96b572e2a688518c9523dbdf2b") {
       public override fun createAllTables(connection: SQLiteConnection) {
-        connection.execSQL("CREATE TABLE IF NOT EXISTS `employees` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `faceVector` BLOB NOT NULL, `photoPath` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `employees` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `faceVectors` TEXT NOT NULL, `photoPath` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE TABLE IF NOT EXISTS `attendance_records` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `employeeId` TEXT NOT NULL, `employeeName` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `status` TEXT NOT NULL, `confidence` REAL NOT NULL, `isSynced` INTEGER NOT NULL)")
         connection.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)")
-        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b3d430438580bc54daf889f817f90b82')")
+        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f33a1c98dc4f627cf9789ce5ffca3dd8')")
       }
 
       public override fun dropAllTables(connection: SQLiteConnection) {
@@ -71,7 +71,7 @@ public class TimeKeepingDatabase_Impl : TimeKeepingDatabase() {
             TableInfo.CREATED_FROM_ENTITY))
         _columnsEmployees.put("name", TableInfo.Column("name", "TEXT", true, 0, null,
             TableInfo.CREATED_FROM_ENTITY))
-        _columnsEmployees.put("faceVector", TableInfo.Column("faceVector", "BLOB", true, 0, null,
+        _columnsEmployees.put("faceVectors", TableInfo.Column("faceVectors", "TEXT", true, 0, null,
             TableInfo.CREATED_FROM_ENTITY))
         _columnsEmployees.put("photoPath", TableInfo.Column("photoPath", "TEXT", false, 0, null,
             TableInfo.CREATED_FROM_ENTITY))

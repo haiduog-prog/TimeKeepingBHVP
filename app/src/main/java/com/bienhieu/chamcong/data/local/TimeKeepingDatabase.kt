@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 @Database(
     entities = [EmployeeEntity::class, AttendanceEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 @TypeConverters(VectorTypeConverter::class)
@@ -64,6 +64,20 @@ abstract class TimeKeepingDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Migration from version 3 → 4.
+         * Changed faceVector from BLOB to faceVectors TEXT (JSON array of arrays).
+         * Since SQLite cannot alter column types, we recreate the table and drop the old one.
+         * Existing employees will be re-synced from Supabase on next launch.
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `employees_new` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `faceVectors` TEXT NOT NULL, `photoPath` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+                db.execSQL("DROP TABLE `employees`")
+                db.execSQL("ALTER TABLE `employees_new` RENAME TO `employees`")
+            }
+        }
+
         // ─── Singleton accessor ───────────────────────────────────────
 
         /**
@@ -80,7 +94,7 @@ abstract class TimeKeepingDatabase : RoomDatabase() {
                     TimeKeepingDatabase::class.java,
                     "chamcong.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                     .also { INSTANCE = it }
             }

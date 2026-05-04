@@ -17,7 +17,7 @@ data class EmployeeEntity(
     @PrimaryKey
     val id: String,
     val name: String,
-    val faceVector: FloatArray,
+    val faceVectors: List<FloatArray>,
     val photoPath: String? = null,
     val createdAt: Long = System.currentTimeMillis()
 ) {
@@ -26,15 +26,21 @@ data class EmployeeEntity(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is EmployeeEntity) return false
-        return id == other.id &&
-                name == other.name &&
-                faceVector.contentEquals(other.faceVector)
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (faceVectors.size != other.faceVectors.size) return false
+        for (i in faceVectors.indices) {
+            if (!faceVectors[i].contentEquals(other.faceVectors[i])) return false
+        }
+        return true
     }
 
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + faceVector.contentHashCode()
+        var vectorsHash = 1
+        faceVectors.forEach { vectorsHash = 31 * vectorsHash + it.contentHashCode() }
+        result = 31 * result + vectorsHash
         return result
     }
 }

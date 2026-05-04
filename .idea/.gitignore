@@ -1,3 +1,23 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+/app/build
+/PayTalk/build
+/utilProject/build
+*.apk
+/.idea
+/.svn
+/app/release
+release
+/.gradle/4.10.1
+/mapping.txt
+/.gradle

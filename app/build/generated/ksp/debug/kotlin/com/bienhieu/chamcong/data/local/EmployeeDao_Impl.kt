@@ -8,7 +8,6 @@ import androidx.room.util.getColumnIndexOrThrow
 import androidx.room.util.performSuspending
 import androidx.sqlite.SQLiteStatement
 import javax.`annotation`.processing.Generated
-import kotlin.ByteArray
 import kotlin.FloatArray
 import kotlin.Int
 import kotlin.Long
@@ -37,13 +36,13 @@ public class EmployeeDao_Impl(
     this.__db = __db
     this.__insertAdapterOfEmployeeEntity = object : EntityInsertAdapter<EmployeeEntity>() {
       protected override fun createQuery(): String =
-          "INSERT OR REPLACE INTO `employees` (`id`,`name`,`faceVector`,`photoPath`,`createdAt`) VALUES (?,?,?,?,?)"
+          "INSERT OR REPLACE INTO `employees` (`id`,`name`,`faceVectors`,`photoPath`,`createdAt`) VALUES (?,?,?,?,?)"
 
       protected override fun bind(statement: SQLiteStatement, entity: EmployeeEntity) {
         statement.bindText(1, entity.id)
         statement.bindText(2, entity.name)
-        val _tmp: ByteArray = __vectorTypeConverter.fromFloatArray(entity.faceVector)
-        statement.bindBlob(3, _tmp)
+        val _tmp: String = __vectorTypeConverter.fromFaceVectors(entity.faceVectors)
+        statement.bindText(3, _tmp)
         val _tmpPhotoPath: String? = entity.photoPath
         if (_tmpPhotoPath == null) {
           statement.bindNull(4)
@@ -55,13 +54,13 @@ public class EmployeeDao_Impl(
     }
     this.__updateAdapterOfEmployeeEntity = object : EntityDeleteOrUpdateAdapter<EmployeeEntity>() {
       protected override fun createQuery(): String =
-          "UPDATE OR ABORT `employees` SET `id` = ?,`name` = ?,`faceVector` = ?,`photoPath` = ?,`createdAt` = ? WHERE `id` = ?"
+          "UPDATE OR ABORT `employees` SET `id` = ?,`name` = ?,`faceVectors` = ?,`photoPath` = ?,`createdAt` = ? WHERE `id` = ?"
 
       protected override fun bind(statement: SQLiteStatement, entity: EmployeeEntity) {
         statement.bindText(1, entity.id)
         statement.bindText(2, entity.name)
-        val _tmp: ByteArray = __vectorTypeConverter.fromFloatArray(entity.faceVector)
-        statement.bindBlob(3, _tmp)
+        val _tmp: String = __vectorTypeConverter.fromFaceVectors(entity.faceVectors)
+        statement.bindText(3, _tmp)
         val _tmpPhotoPath: String? = entity.photoPath
         if (_tmpPhotoPath == null) {
           statement.bindNull(4)
@@ -97,7 +96,7 @@ public class EmployeeDao_Impl(
       try {
         val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
         val _columnIndexOfName: Int = getColumnIndexOrThrow(_stmt, "name")
-        val _columnIndexOfFaceVector: Int = getColumnIndexOrThrow(_stmt, "faceVector")
+        val _columnIndexOfFaceVectors: Int = getColumnIndexOrThrow(_stmt, "faceVectors")
         val _columnIndexOfPhotoPath: Int = getColumnIndexOrThrow(_stmt, "photoPath")
         val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
         val _result: MutableList<EmployeeEntity> = mutableListOf()
@@ -107,10 +106,10 @@ public class EmployeeDao_Impl(
           _tmpId = _stmt.getText(_columnIndexOfId)
           val _tmpName: String
           _tmpName = _stmt.getText(_columnIndexOfName)
-          val _tmpFaceVector: FloatArray
-          val _tmp: ByteArray
-          _tmp = _stmt.getBlob(_columnIndexOfFaceVector)
-          _tmpFaceVector = __vectorTypeConverter.toFloatArray(_tmp)
+          val _tmpFaceVectors: List<FloatArray>
+          val _tmp: String
+          _tmp = _stmt.getText(_columnIndexOfFaceVectors)
+          _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
           val _tmpPhotoPath: String?
           if (_stmt.isNull(_columnIndexOfPhotoPath)) {
             _tmpPhotoPath = null
@@ -119,7 +118,7 @@ public class EmployeeDao_Impl(
           }
           val _tmpCreatedAt: Long
           _tmpCreatedAt = _stmt.getLong(_columnIndexOfCreatedAt)
-          _item = EmployeeEntity(_tmpId,_tmpName,_tmpFaceVector,_tmpPhotoPath,_tmpCreatedAt)
+          _item = EmployeeEntity(_tmpId,_tmpName,_tmpFaceVectors,_tmpPhotoPath,_tmpCreatedAt)
           _result.add(_item)
         }
         _result
@@ -136,7 +135,7 @@ public class EmployeeDao_Impl(
       try {
         val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
         val _columnIndexOfName: Int = getColumnIndexOrThrow(_stmt, "name")
-        val _columnIndexOfFaceVector: Int = getColumnIndexOrThrow(_stmt, "faceVector")
+        val _columnIndexOfFaceVectors: Int = getColumnIndexOrThrow(_stmt, "faceVectors")
         val _columnIndexOfPhotoPath: Int = getColumnIndexOrThrow(_stmt, "photoPath")
         val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
         val _result: MutableList<EmployeeEntity> = mutableListOf()
@@ -146,10 +145,10 @@ public class EmployeeDao_Impl(
           _tmpId = _stmt.getText(_columnIndexOfId)
           val _tmpName: String
           _tmpName = _stmt.getText(_columnIndexOfName)
-          val _tmpFaceVector: FloatArray
-          val _tmp: ByteArray
-          _tmp = _stmt.getBlob(_columnIndexOfFaceVector)
-          _tmpFaceVector = __vectorTypeConverter.toFloatArray(_tmp)
+          val _tmpFaceVectors: List<FloatArray>
+          val _tmp: String
+          _tmp = _stmt.getText(_columnIndexOfFaceVectors)
+          _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
           val _tmpPhotoPath: String?
           if (_stmt.isNull(_columnIndexOfPhotoPath)) {
             _tmpPhotoPath = null
@@ -158,7 +157,7 @@ public class EmployeeDao_Impl(
           }
           val _tmpCreatedAt: Long
           _tmpCreatedAt = _stmt.getLong(_columnIndexOfCreatedAt)
-          _item = EmployeeEntity(_tmpId,_tmpName,_tmpFaceVector,_tmpPhotoPath,_tmpCreatedAt)
+          _item = EmployeeEntity(_tmpId,_tmpName,_tmpFaceVectors,_tmpPhotoPath,_tmpCreatedAt)
           _result.add(_item)
         }
         _result
@@ -177,7 +176,7 @@ public class EmployeeDao_Impl(
         _stmt.bindText(_argIndex, id)
         val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
         val _columnIndexOfName: Int = getColumnIndexOrThrow(_stmt, "name")
-        val _columnIndexOfFaceVector: Int = getColumnIndexOrThrow(_stmt, "faceVector")
+        val _columnIndexOfFaceVectors: Int = getColumnIndexOrThrow(_stmt, "faceVectors")
         val _columnIndexOfPhotoPath: Int = getColumnIndexOrThrow(_stmt, "photoPath")
         val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
         val _result: EmployeeEntity?
@@ -186,10 +185,10 @@ public class EmployeeDao_Impl(
           _tmpId = _stmt.getText(_columnIndexOfId)
           val _tmpName: String
           _tmpName = _stmt.getText(_columnIndexOfName)
-          val _tmpFaceVector: FloatArray
-          val _tmp: ByteArray
-          _tmp = _stmt.getBlob(_columnIndexOfFaceVector)
-          _tmpFaceVector = __vectorTypeConverter.toFloatArray(_tmp)
+          val _tmpFaceVectors: List<FloatArray>
+          val _tmp: String
+          _tmp = _stmt.getText(_columnIndexOfFaceVectors)
+          _tmpFaceVectors = __vectorTypeConverter.toFaceVectors(_tmp)
           val _tmpPhotoPath: String?
           if (_stmt.isNull(_columnIndexOfPhotoPath)) {
             _tmpPhotoPath = null
@@ -198,7 +197,7 @@ public class EmployeeDao_Impl(
           }
           val _tmpCreatedAt: Long
           _tmpCreatedAt = _stmt.getLong(_columnIndexOfCreatedAt)
-          _result = EmployeeEntity(_tmpId,_tmpName,_tmpFaceVector,_tmpPhotoPath,_tmpCreatedAt)
+          _result = EmployeeEntity(_tmpId,_tmpName,_tmpFaceVectors,_tmpPhotoPath,_tmpCreatedAt)
         } else {
           _result = null
         }

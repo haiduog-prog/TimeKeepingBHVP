@@ -96,7 +96,7 @@ class AttendanceViewModel(
 
     // ─── Attendance Flow ───
 
-    fun onFaceDetected(faceBitmap: Bitmap) {
+    fun onFaceDetected(faceBitmap: Bitmap, yaw: Float) {
         // Always update the latest face so the registration dialog can preview it
         latestDetectedFace.value = faceBitmap
 
@@ -167,7 +167,7 @@ class AttendanceViewModel(
                 val employee = EmployeeEntity(
                     id = java.util.UUID.randomUUID().toString(),
                     name = name,
-                    faceVector = embedding,
+                    faceVectors = listOf(embedding),
                     photoPath = imagePath
                 )
 
@@ -207,7 +207,7 @@ class AttendanceViewModel(
 
                 // 3. Update database & Trigger Sync
                 val updatedEmployee = employee.copy(
-                    faceVector = embedding,
+                    faceVectors = listOf(embedding),
                     photoPath = imagePath
                 )
 

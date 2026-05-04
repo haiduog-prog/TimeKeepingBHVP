@@ -49,7 +49,7 @@ import java.io.ByteArrayOutputStream
 class FaceAnalyzer(
     private val isLivenessEnabled: () -> Boolean,
     private val onLivenessStateChange: (Boolean) -> Unit,
-    private val onFaceDetected: (Bitmap) -> Unit,
+    private val onFaceDetected: (Bitmap, Float) -> Unit,
     private val onNoFace: () -> Unit
 ) : ImageAnalysis.Analyzer {
 
@@ -135,7 +135,7 @@ class FaceAnalyzer(
                         onLivenessStateChange(false)
                         val croppedFace = cropFaceFromProxy(imageProxy, bestFace)
                         if (croppedFace != null) {
-                            onFaceDetected(croppedFace)
+                            onFaceDetected(croppedFace, bestFace.headEulerAngleY)
                         } else {
                             handleNoFace()
                         }

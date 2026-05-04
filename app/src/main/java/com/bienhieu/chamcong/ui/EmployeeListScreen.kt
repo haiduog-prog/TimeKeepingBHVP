@@ -175,7 +175,7 @@ private fun EmployeeCard(employee: EmployeeEntity, onDelete: () -> Unit, onRegis
 
             // Action Buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (employee.faceVector.isEmpty()) {
+                if (employee.faceVectors.isEmpty()) {
                     OutlinedButton(
                         onClick = onRegisterFace,
                         modifier = Modifier.padding(end = 8.dp)
