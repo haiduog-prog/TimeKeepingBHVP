@@ -7,6 +7,7 @@ import com.bienhieu.chamcong.data.local.EmployeeEntity
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,7 +39,7 @@ class SupabaseSyncManager(
                 remoteEmployees.forEach { remote ->
                     if (remote.isActive) {
                         try {
-                            val vectors = vectorConverter.toFaceVectors(remote.faceVector ?: "")
+                            val vectors = vectorConverter.toFaceVectors(remote.faceVector?.toString() ?: "")
 
                             localEmployees.add(
                                 EmployeeEntity(
@@ -143,10 +144,11 @@ class SupabaseSyncManager(
         try {
             val vectorConverter = com.bienhieu.chamcong.data.local.VectorTypeConverter()
             val vectorString = vectorConverter.fromFaceVectors(faceVectors)
+            val jsonElement = Json.parseToJsonElement(vectorString)
             
             SupabaseClient.client.from("employees").update(
                 {
-                    set("face_vector", vectorString)
+                    set("face_vector", jsonElement)
                 }
             ) {
                 filter {

@@ -2,13 +2,14 @@ package com.bienhieu.chamcong.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class RemoteEmployee(
     val id: String,
     val name: String,
     @SerialName("face_vector")
-    val faceVector: String?,
+    val faceVector: JsonElement? = null,
     @SerialName("is_active")
     val isActive: Boolean = true
 )

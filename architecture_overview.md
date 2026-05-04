@@ -15,12 +15,12 @@ app/src/main/
 │   │   └── FaceAnalyzer.kt          ← CameraX + ML Kit face detection
 │   │
 │   ├── data/local/
-│   │   ├── EmployeeEntity.kt        ← Room entity (face vector storage)
+│   │   ├── EmployeeEntity.kt        ← Room entity (faceVectors nullable List<FloatArray>)
 │   │   ├── AttendanceEntity.kt      ← Room entity (check-in/out log)
 │   │   ├── EmployeeDao.kt           ← DAO for employee CRUD
 │   │   ├── AttendanceDao.kt         ← DAO for attendance records
-│   │   ├── VectorTypeConverter.kt   ← FloatArray ↔ ByteArray converter
-│   │   └── TimeKeepingDatabase.kt      ← Room database singleton
+│   │   ├── VectorTypeConverter.kt   ← FloatArray ↔ JSON converter
+│   │   └── TimeKeepingDatabase.kt      ← Room database singleton (version 6)
 │   │
 │   ├── ml/
 │   │   ├── FaceEmbeddingHelper.kt   ← TFLite MobileFaceNet inference

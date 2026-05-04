@@ -64,150 +64,16 @@ import java.util.concurrent.Executors
  * └──────────────────────────┘
  */
 @Composable
-fun AttendanceScreen(viewModel: AttendanceViewModel, onNavigateToEmployees: () -> Unit = {}) {
+fun AttendanceScreen(
+    viewModel: AttendanceViewModel,
+    onNavigateToEmployees: () -> Unit = {},
+    onNavigateToRegister: () -> Unit = {}
+) {
     val uiState by viewModel.uiState.collectAsState()
-    var showRegisterDialog by remember { mutableStateOf(false) }
-    val employeeToRegister by viewModel.employeeToRegister.collectAsState()
-    val context = LocalContext.current
     
     val isLivenessEnabled by viewModel.isLivenessEnabled.collectAsState()
     val showLivenessPrompt by viewModel.showLivenessPrompt.collectAsState()
-
-    // ── Registration Dialog ──
-    if (showRegisterDialog) {
-        var name by remember { mutableStateOf("") }
-        val latestFace by viewModel.latestDetectedFace.collectAsState()
-
-        AlertDialog(
-            onDismissRequest = { showRegisterDialog = false },
-            title = { Text("Đăng ký nhân viên mới") },
-            text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Họ và tên") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Khuôn mặt hiện tại:",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                            .clip(CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (latestFace != null) {
-                            androidx.compose.foundation.Image(
-                                bitmap = latestFace!!.asImageBitmap(),
-                                contentDescription = "Preview",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                            )
-                        } else {
-                            Icon(Icons.Default.Face, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        }
-                    }
-                    if (latestFace == null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Vui lòng nhìn vào camera...",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        latestFace?.let { face ->
-                            viewModel.registerEmployee(name, face, context)
-                            showRegisterDialog = false
-                        }
-                    },
-                    enabled = name.isNotBlank() && latestFace != null
-                ) {
-                    Text("Chụp & Lưu")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showRegisterDialog = false }) {
-                    Text("Hủy")
-                }
-            }
-        )
-    }
-
-    // ── Update Existing Employee Face Dialog ──
-    if (employeeToRegister != null) {
-        val latestFace by viewModel.latestDetectedFace.collectAsState()
-
-        AlertDialog(
-            onDismissRequest = { viewModel.cancelRegistration() },
-            title = { Text("Xác nhận gán khuôn mặt") },
-            text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "Nhân viên: ${employeeToRegister?.name}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                            .clip(CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (latestFace != null) {
-                            androidx.compose.foundation.Image(
-                                bitmap = latestFace!!.asImageBitmap(),
-                                contentDescription = "Preview",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                            )
-                        } else {
-                            Icon(Icons.Default.Face, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        }
-                    }
-                    if (latestFace == null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Vui lòng nhìn vào camera...",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (latestFace != null) {
-                            viewModel.updateEmployeeFace(context)
-                        }
-                    },
-                    enabled = latestFace != null
-                ) {
-                    Text("Gán & Lưu")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.cancelRegistration() }) {
-                    Text("Hủy")
-                }
-            }
-        )
-    }
+    val cameraPrompt by viewModel.cameraPrompt.collectAsState()
 
     // ── Matched Result Popup (blocks scanning until dismissed) ──
     if (uiState is AttendanceUiState.Matched) {
@@ -292,7 +158,7 @@ fun AttendanceScreen(viewModel: AttendanceViewModel, onNavigateToEmployees: () -
         HeaderSection(
             isLivenessEnabled = isLivenessEnabled,
             onLivenessToggle = { viewModel.toggleLiveness(it) },
-            onAddClick = { showRegisterDialog = true },
+            onAddClick = onNavigateToRegister,
             onNavigateToEmployees = onNavigateToEmployees
         )
 
@@ -313,16 +179,31 @@ fun AttendanceScreen(viewModel: AttendanceViewModel, onNavigateToEmployees: () -
                 if (showLivenessPrompt) {
                     Text(
                         text = "Vui lòng chớp mắt chậm rãi...",
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = Color.White,
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 32.dp)
-                            .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
+                            .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }
+            }
+
+            // ── Camera Prompt (yaw quality filter) ──
+            if (cameraPrompt != null) {
+                Text(
+                    text = cameraPrompt!!,
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp)
+                        .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 

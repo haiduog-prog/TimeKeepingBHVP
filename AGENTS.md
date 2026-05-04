@@ -58,11 +58,12 @@ Never run TFLite on `Dispatchers.IO` — it's CPU-bound. Never block the CameraX
 ---
 
 ## Room Database
-- **DB name:** `chamcong.db` · **Version:** 4 · Schema exported to `app/schemas/`.
+- **DB name:** `chamcong.db` · **Version:** 6 · Schema exported to `app/schemas/`.
 - Face vectors stored as nested JSON string (`List<FloatArray>` ↔ `VectorTypeConverter`).
 - **Never use `fallbackToDestructiveMigration`** — always add an explicit `Migration` in `TimeKeepingDatabase`.
 - When adding a column: `ALTER TABLE … ADD COLUMN …` with a `DEFAULT` value.
 - When changing a column type: create `_new` table, copy data, drop old, rename (see `MIGRATION_3_4`).
+- When making a column nullable: recreate table (see `MIGRATION_5_6`).
 
 ---
 

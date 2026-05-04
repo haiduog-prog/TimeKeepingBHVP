@@ -57,7 +57,11 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmployeeListScreen(viewModel: AttendanceViewModel, onBack: () -> Unit) {
+fun EmployeeListScreen(
+    viewModel: AttendanceViewModel,
+    onBack: () -> Unit,
+    onNavigateToRegister: (employeeId: String) -> Unit = {}
+) {
     val employees by viewModel.employees.collectAsState(initial = emptyList())
 
     Scaffold(
@@ -104,8 +108,7 @@ fun EmployeeListScreen(viewModel: AttendanceViewModel, onBack: () -> Unit) {
                         employee = employee,
                         onDelete = { viewModel.deleteEmployee(employee.id) },
                         onRegisterFace = {
-                            viewModel.startRegistrationFor(employee)
-                            onBack()
+                            onNavigateToRegister(employee.id)
                         }
                     )
                 }
